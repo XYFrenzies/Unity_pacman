@@ -2,47 +2,67 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.InputSystem;
+
 
 public class PlayerMovement : MonoBehaviour
 {
-    public TextMeshProUGUI countText;
+    //public TextMeshProUGUI countText;
     public float moveSpeed = 2;
 
     private Rigidbody rb;
-    private int count;
+
+    private Controls controls;
+
     // Start is called before the first frame update
+
+
+    private void Awake()
+    {
+        controls = new Controls();
+        controls.Player.Move.performed += OnMove;
+
+        controls.Enable();
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        count = 0;
-        SetCountText();
+        
+        // SetCountText();
+    }
+
+    void OnMove(InputAction.CallbackContext callback)
+    {
+        
+        Vector3 inputForce = callback.action.ReadValue<Vector3>();
+        rb.AddForce(inputForce * moveSpeed);
+        rb.AddForce(0, 0.8f, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
+        Keyboard kb = InputSystem.GetDevice<Keyboard>();
 
-        Vector3 inputForce = new Vector3();
-
-        inputForce.x = Input.GetAxis("Horizontal");
-        inputForce.z = Input.GetAxis("Vertical");
-        rb.AddForce(inputForce * moveSpeed);
-        rb.AddForce(0, 0.8f, 0);
-
-        //if(Input.GetButtonDown())
-    }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "PickUp")
+        if (kb.wKey.wasPressedThisFrame)
         {
-            other.gameObject.SetActive(false);
-            //Destroy(other.gameObject);
-            count = count + 1;
-            SetCountText();
+
         }
+
     }
-    private void SetCountText() 
-    {
-        countText.text = "Score: " + count.ToString();
-    }
+    //private void OnTriggerEnter(Collider other)
+    //{
+    //    //if (other.gameObject.tag == "PickUp")
+    //    //{
+    //    //    other.gameObject.SetActive(false);
+    //    //    //Destroy(other.gameObject);
+    //    //    count = count + 1;
+    //    //    //SetCountText();
+    //    //}
+
+    //}
+    //private void SetCountText()
+    //{
+    //    countText.text = countTeam1.ToString() + " : " + countTeam2.ToString();
+    //}
 }
